@@ -44,15 +44,23 @@ Three different artifacts. Identical input. Only the preset changes.
 
 Each preset also has a standalone canonical example under `examples/<preset>.good.md` — the renderer mirrors its shape.
 
+## Agnostic by design
+
+Scribe is **agent-agnostic**. It runs anywhere an LLM agent can read skill-style markdown instructions and call tools — Claude Code, Codex, Gemini CLI, or any custom harness. There is no platform lock-in.
+
+The engine detects capabilities at runtime. A surface with full filesystem + shell + git gets the rich path; a chat-only surface with connectors only can still run `adr` and `handoff`. The set of `used` sources changes per invocation — the engine doesn't.
+
 ## Install
 
-Scribe is a [Claude Code skill](https://docs.claude.com/en/docs/agents/skills). Clone into your skills directory:
+Clone the repo into whatever directory your agent reads skills from.
+
+For Claude Code:
 
 ```bash
 git clone https://github.com/Elesiann/scribe.git ~/.claude/skills/scribe
 ```
 
-Restart Claude Code. The skill auto-activates on trigger phrases.
+For other agents, drop the directory wherever skills/instructions are loaded from and point your agent at `SKILL.md`. The skill self-bootstraps from there.
 
 ## Use
 
@@ -121,7 +129,7 @@ Sources
 - error: gh
 ```
 
-This is what separates Scribe from "ChatGPT summarized this". The ledger is emitted deterministically from probe results — no LLM reasoning, just lookup. **Hallucination-proof by design.**
+This is what separates Scribe from "the model summarized this". The ledger is emitted deterministically from probe results — no LLM reasoning, just lookup. **Hardened by design.**
 
 ## Extending
 
@@ -134,14 +142,6 @@ A preset is a markdown file under `presets/` declaring:
 5. A validation checklist run before delivery
 
 The matching `examples/<preset>.good.md` is the canonical shape the renderer mirrors. Start from any existing preset — they all follow the same skeleton.
-
-## Non-goals (v1)
-
-- No own OAuth — relies on existing Claude connectors
-- No auto-publish — user always confirms destination
-- No CLI binary yet — that's a future adapter
-- No multi-audience in a single invocation
-- No template evolution / learning loop
 
 ## License
 

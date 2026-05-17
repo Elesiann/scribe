@@ -316,7 +316,7 @@ Sources
 - error: gh
 ```
 
-The ledger is emitted deterministically from `sources[]` in the bundle — no LLM reasoning, only lookup. **Hallucination-proof by design.**
+The ledger is emitted deterministically from `sources[]` in the bundle — no LLM reasoning, only lookup. **Hardened by design.**
 
 ## Step 8 — Preview + deliver
 
@@ -344,6 +344,6 @@ If the user requests adjustments, re-render using the same bundle (don't re-gath
 
 ## Capability-based, not platform-locked
 
-Scribe runs on any Claude surface — it detects capabilities at runtime. Implemented first on Claude Code (full capability range), but not bound to it. Claude Desktop/web can run `adr` and `handoff` with just conversation+connectors. Future surfaces are mapped by the same protocol.
+Scribe is agent-agnostic — it detects capabilities at runtime. It runs in any agent harness that can read skill-style markdown and call tools (Claude Code, Codex, Gemini CLI, custom harnesses). A surface with full filesystem + shell + git gets the rich path; a chat-only surface with connectors only can still run `adr` and `handoff`. New surfaces are mapped by the same protocol — no special-casing.
 
 Runtime plumbing detail in [protocols/capability-detection.md](protocols/capability-detection.md). **Plumbing, not pitch.**

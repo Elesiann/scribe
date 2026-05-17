@@ -147,4 +147,4 @@ The substitution note goes **inside the source entry**, not as a separate line. 
 
 The ledger is emitted by the **rendering phase** (Step 7 of the SKILL.md flow), not during synthesis. Rendering reads the capability manifest and per-source item counts from the ContextBundle and formats them deterministically — no LLM reasoning is needed for the ledger itself, only lookup.
 
-This keeps the ledger reliable: even if synthesis hallucinates elsewhere in the artifact, the ledger reflects exactly what was collected. **Hallucination-proof by design.**
+This keeps the ledger reliable: even if synthesis drifts elsewhere in the artifact, the ledger reflects exactly what was collected. **Hardened by design.**

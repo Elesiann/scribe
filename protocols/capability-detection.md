@@ -215,10 +215,11 @@ If a source was explicitly requested, graceful degradation only starts **after**
 
 ## Surface notes (non-prescriptive)
 
-Capability detection is runtime-driven — it does not assume product branding. Common patterns observed:
+Capability detection is runtime-driven — it does not assume product branding. Common patterns observed across agent harnesses:
 
-- **Claude Code (CLI/IDE):** typically has full `conversation + bash + filesystem + connectors`
-- **Claude Desktop / claude.ai web:** typically has `conversation + connectors`, without `bash` / `filesystem`
-- **Future surfaces:** mapped by the same protocol, no special-casing
+- **CLI / IDE harnesses with shell + filesystem access:** typically have full `conversation + bash + filesystem + connectors`
+- **Chat-only harnesses (desktop / web):** typically have `conversation + connectors`, without `bash` / `filesystem`
+- **Headless / API harnesses:** capability set depends entirely on which tools the integrator exposes
+- **New surfaces:** mapped by the same protocol, no special-casing
 
 The engine doesn't change. What changes is the set of sources marked `used` per invocation.
