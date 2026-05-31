@@ -33,7 +33,7 @@ An ADR is not a tracker task. The two serve different lifecycles and should not 
 ## Required inputs
 
 - **decision_subject** — what was decided
-  - Extractable from the active conversation. Ask only if ambiguous among 2+ detected decisions.
+  - Extractable from session trace, conversation, linked docs, tracker discussion, or code context. Ask only if ambiguous among 2+ detected decisions.
 
 ## Optional inputs
 
@@ -43,7 +43,7 @@ An ADR is not a tracker task. The two serve different lifecycles and should not 
 ## Minimum viable signal
 
 Scribe requires **at least one clear or candidate decision**. If there isn't one:
-> "I didn't detect a clear decision in the conversation. What decision do you want to document?"
+> "I didn't detect a clear decision in the available evidence. What decision do you want to document?"
 
 Never generate an ADR with a fabricated decision.
 
@@ -53,18 +53,28 @@ Never generate an ADR with a fabricated decision.
 
 Secondary fields: `entities.links`, `raw.manual_notes`.
 
-## Sources (priority)
+## Source selection
+
+ADR is evidence-led, not conversation-led. Use the source that best captures the
+decision, rationale, alternatives, and consequences.
 
 | Source | Role |
 |---|---|
-| `conversation` | **primary** — discussion, decision, rationale |
+| `session_trace` | accepted/rejected decisions, rationale, attempts, and corrections from the work session |
+| `conversation` | discussion, decision, rationale |
 | `git_local` | contextualizes affected code or local changes (diff, files touched) |
 | `filesystem` | read referenced files/resources |
 | connected docs/tracker sources | linked docs/tasks (if mentioned) |
 
 ## Gathering (capability-gated)
 
-### conversation (primary, always)
+### session_trace (if available)
+
+Follow [../protocols/session-trace.md](../protocols/session-trace.md). Use
+`decisions[]`, `attempts[]`, and correction events to identify the decision,
+real alternatives, and rationale.
+
+### conversation (if available and relevant)
 
 Filter by semantic markers:
 - **Explicit decision:** "going with X", "we chose Y", "rejected Z", "decided"
@@ -72,7 +82,7 @@ Filter by semantic markers:
 - **Alternatives:** "considered A", "thought about B but", "alternative would be"
 - **Consequences:** "this implies", "will need", "the cost is"
 
-### git (if `used`)
+### git (if available and relevant)
 
 ```bash
 git diff HEAD~5..HEAD --stat 2>/dev/null
@@ -152,7 +162,7 @@ Sources
 | Situation | Behavior |
 |---|---|
 | No git | Purely decisional ADR (just conversation + manual links) — valid |
-| No substantive conversation | "Describe the decision in 2-3 lines so I can expand" |
+| No substantive decision evidence | "Describe the decision in 2-3 lines so I can expand" |
 | Multiple decisions detected | Ask which (don't generate a combined ADR) |
 | No clear decision | Don't generate — ask for description |
 

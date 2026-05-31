@@ -4,7 +4,7 @@
 
 **Question it answers:** "How do I continue without rebuilding context?"
 
-**Default audience:** next operator — human teammate OR next Claude session.
+**Default audience:** next operator — human teammate, future session, or another agent.
 
 ## Contract
 
@@ -28,8 +28,8 @@
 ## Minimum viable signal
 
 Requires:
-- `objective` declared or inferable (branch name + conversation)
-- At least 1 item in current state (branch info, modified file, recent decision)
+- `objective` declared or inferable from session, resource, tracker, branch, or conversation
+- At least 1 item in current state (session state, modified artifact, task/doc state, branch info, recent decision, or blocker)
 
 Without these: *"What's the objective? I need to know what's being continued."*
 
@@ -39,18 +39,30 @@ Without these: *"What's the objective? I need to know what's being continued."*
 
 Secondary fields: `entities.repos`, `entities.files`, `summary.where_we_stopped`.
 
-## Sources (priority)
+## Source selection
+
+Handoff is harness-agnostic. Use the sources that best explain how to resume the
+selected workstream without rebuilding context.
 
 | Source | Role |
 |---|---|
-| `git_local` | current local code state — branch, uncommitted work, recent changes |
+| `session_trace` | compact record of the active work session — objective, decisions, attempts, state, next actions |
+| `git_local` | current local code state when code artifacts are part of the handoff |
 | `conversation` | decisions and attempts from the session |
 | `filesystem` | files/resources in progress |
 | connected trackers/docs | related work items or docs (optional) |
 
 ## Gathering (capability-gated)
 
-### git (if `used`)
+### session_trace (if available)
+
+Follow [../protocols/session-trace.md](../protocols/session-trace.md). Prefer a
+session trace over re-reading the whole transcript when the surface provides one.
+
+Captures: objective, important timeline events, decisions, attempts, artifacts,
+current state, open threads, and concrete next actions.
+
+### git (if available and relevant)
 
 ```bash
 # current state
@@ -67,7 +79,7 @@ git log --merges -1 --format='%h|%s'
 
 Captures: current branch, modified files, recent commits, neighboring branches.
 
-### conversation (primary)
+### conversation (if available and relevant)
 
 Filter by:
 - **Decisions taken:** "we defined X", "we chose Y", "accepted Z"
@@ -111,9 +123,9 @@ Skeleton:
 <1-2 lines, concrete>
 
 ## Current state
-- **Branch:** <name>
-- **Uncommitted modifications:** <short list or "none">
-- **Relevant recent evidence:** <change/review/task/doc ref + 1-line>
+- **Workspace / resource:** <repo, task, doc, project, or session scope>
+- **Current state:** <branch, task status, doc state, modified artifacts, or equivalent>
+- **Relevant recent evidence:** <change/review/task/doc/session ref + 1-line>
 
 ## Decisions already made
 - <decision 1> — **don't re-discuss**
@@ -170,10 +182,10 @@ Sources
 
 | Situation | Behavior |
 |---|---|
-| No git | Shorter handoff, no technical state; conversation only |
-| No substantive conversation | "Tell me what you're working on" |
-| Ambiguous objective | Ask which among detected top-3 candidates (branch name, features, tasks) |
-| Branch with no recent commits | Generate a "parking" handoff (current context, no progress) |
+| No git | Omit branch/code state; use session, tracker, docs, manual notes, or conversation |
+| No substantive session/resource state | "Tell me what you're working on" |
+| Ambiguous objective | Ask which among detected top-3 candidates (session objective, resource, branch, feature, task) |
+| Workstream has no recent movement | Generate a parking handoff only if current context is still worth preserving |
 
 ## Do / Don't
 

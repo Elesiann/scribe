@@ -12,7 +12,7 @@
 |---|---|
 | Input | User asks what is stalled, drifting, parked, or needs a decision |
 | Output | Markdown triage brief grouped by urgency tier, with rationale and recommended action per item |
-| Scope | Default: current user across connected work-tracking systems over a recent period |
+| Scope | Default: current user across active work surfaces over a recent period |
 | Destination | Inline (default), file, or workspace-destination suggestion |
 
 ## Required inputs
@@ -25,7 +25,7 @@ Ask only if not clear from the prompt:
 
 ## Optional inputs
 
-- **scope** — default: current user across connected work-tracking systems
+- **scope** — default: current user across active work surfaces
   - Accepts: `"owner:any"`, a named project, workspace cluster, or initiative
 - **stale_hint** — explicit threshold override from the user
   - Accepts: `"consider review items stale after 10 days"`, `"use 7d for drift"`
@@ -36,19 +36,20 @@ Ask only if not clear from the prompt:
 
 For `loose-ends` to render well:
 
-- at least **one work-tracking source** must be `used`
-- conversation-only is **invalid** for this preset
+- at least **one trackable work surface** must be `used`
+- conversation-only is valid only when the user provides explicit work objects with status/activity clues; casual conversation context is not enough
 
-Work-tracking sources include:
+Trackable work surfaces include:
 
-- `git_local`
-- `gh`
-- connected work tracker / docs sources (e.g. `notion`, `atlassian`)
+- connected work tracker / issue / docs sources (e.g. `notion`, `atlassian`)
+- code-hosting sources with open PRs, review state, or linked work objects
+- local workspace evidence with named branches/artifacts and activity history
+- session traces or manual notes with explicit parked/blocked/deferred work objects
 - custom MCPs or APIs that expose work objects (tasks, branches, builds, etc.)
 
 Below this, Scribe asks:
 
-> "I need at least one work-tracking source for a useful loose-ends pass. Do you want to connect a source, point me at a workspace/system, or switch to another preset?"
+> "I need at least one trackable work surface for a useful loose-ends pass. Do you want to connect a source, point me at a workspace/system, paste explicit work items, or switch to another preset?"
 
 ## Primary item types (ContextBundle)
 
@@ -64,12 +65,17 @@ Secondary fields: per-item triage metadata:
 - `owner`
 - `system`
 
-## Sources (priority)
+## Source selection
+
+Loose-ends is evidence-led. Use sources that expose work objects plus activity,
+status, ownership, or explicit parked/blocked signals.
 
 | Source | Role |
 |---|---|
 | connected work trackers / custom MCP work trackers | task and status reality |
-| code-hosting review signal / `git_local` | code movement, open reviews, branch momentum |
+| code-hosting review signal | open reviews, review state, merge state, linked work |
+| `git_local` | branch/artifact momentum when it can be tied to a named work object |
+| `session_trace` | explicit parked/blocked/deferred work and current session state |
 | conversation | explicit parked signals, scope overrides, user threshold hints |
 | manual notes | explicit hold/defer context |
 
@@ -87,10 +93,12 @@ Good signals:
 
 Rules:
 
+- do not treat bare git history as a trackable work surface; it must identify a
+  named branch/artifact/workstream and provide activity signals
 - prefer **relative signals** over hardcoded thresholds
 - if the user gives a threshold override, it wins
 - if not, use contextual judgment ("materially out of pace with peers", "marked active but quiet", "status says active, evidence says otherwise")
-- if the same item appears across multiple work-tracking sources, compare explicit fields before assigning a triage label:
+- if the same item appears across multiple trackable sources, compare explicit fields before assigning a triage label:
   - `status`
   - `priority`
   - `owner`
@@ -134,7 +142,7 @@ Per surfaced item, extract or derive:
 
 ### Cross-source mismatch rule
 
-If the same work item appears across multiple work-tracking sources and those sources disagree on explicit fields, do not silently pick one view and proceed as if nothing happened.
+If the same work item appears across multiple trackable sources and those sources disagree on explicit fields, do not silently pick one view and proceed as if nothing happened.
 
 Allowed behavior:
 
@@ -222,7 +230,8 @@ Sources
 
 | Situation | Behavior |
 |---|---|
-| Only one work-tracking source available | Render a narrower triage and lower `flag_confidence` when comparison is weak |
+| Only one trackable source available | Render a narrower triage and lower `flag_confidence` when comparison is weak |
+| Only bare git history available | Ask for a tracker, branch/workstream scope, or manual notes before rendering |
 | User provides explicit stale threshold | Use it and say so in `why flagged` |
 | Mixed signals, weak suspicion | Keep the item out rather than pad the report |
 | Cross-source conflict on explicit status/priority/activity | Keep the item only if the mismatch itself is operationally relevant; surface it and lower `flag_confidence` |
@@ -250,6 +259,6 @@ Sources
 - Does every surfaced item answer what is stuck, why it is suspect, and what decision is needed now?
 - Is `parked` used only when there is explicit evidence of intentional pause?
 - Are `why flagged`, `recommended_action`, `confidence`, and `evidence` present for every item?
-- If multiple work-tracking sources touched the same item, were explicit conflicts surfaced instead of flattened?
+- If multiple trackable sources touched the same item, were explicit conflicts surfaced instead of flattened?
 - Is the output grouped by urgency tier rather than source system?
 - Does the output match the loose-ends example shape and stay in one language?

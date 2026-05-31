@@ -45,18 +45,26 @@ Below this, Scribe asks:
 
 Secondary fields: `summary.themes`, `summary.where_we_stopped`.
 
-## Sources (priority)
+## Source selection
+
+Retro is contrast-led. Use sources that expose outcomes, friction, surprises,
+attempts, and lessons for the requested scope.
 
 | Source | Role |
 |---|---|
-| weekly-like evidence sources | raw material for the period |
+| context-selected progress evidence | raw material for the period |
+| `session_trace` | attempts, corrections, failures, surprises, and lessons from an agentic work session |
 | conversation | lessons, frustrations, surprises, intent |
 | connected trackers/docs | explicit tasks, delays, completions |
 | `git_local` / code-hosting review signal | supporting detail only |
 
 ## Gathering (capability-gated)
 
-Reuse the same base evidence as `weekly`, then extract reflection-oriented signal:
+If a `session_trace` is available and relevant, use it for attempts,
+corrections, failures, and where the session changed direction.
+
+Reuse the same source-selection discipline as `weekly`, then extract
+reflection-oriented signal:
 
 - repeated retries or rework
 - blockers that consumed more energy than expected

@@ -46,21 +46,25 @@ Below this, Scribe asks:
 
 Secondary fields: `summary.headline`, `summary.themes`, `summary.where_we_stopped`.
 
-## Sources (priority)
+## Source selection
+
+Client updates are audience-led. Use sources that prove externally meaningful
+progress, risk, or asks for the requested audience.
 
 | Source | Role |
 |---|---|
-| weekly-like evidence sources | source material for recent progress |
+| context-selected progress evidence | source material for recent progress |
+| `session_trace` | work-session outcomes, blockers, decisions, and next steps when they matter to the audience |
 | conversation | audience framing, impact wording, asks |
 | connected trackers/docs | roadmap, milestone, or stakeholder-facing context |
 | `git_local` / code-hosting review signal | supporting evidence only; never the output's framing |
 
 ## Gathering (capability-gated)
 
-Reuse the same evidence strategy as `weekly`, then apply a stricter communication filter:
+Reuse the same source-selection discipline as `weekly`, then apply a stricter communication filter:
 
 - prefer outcomes over implementation steps
-- translate technical work into stakeholder-relevant impact
+- translate implementation detail into stakeholder-relevant impact
 - keep blockers as risks or asks, not engineering complaints
 
 Useful evidence patterns:
@@ -91,7 +95,7 @@ Tone: clear, calm, low-jargon, stakeholder-safe.
 
 Rules:
 
-- translate technical progress into user or stakeholder impact
+- translate implementation progress into user or stakeholder impact
 - avoid commit-by-commit narration
 - mention risks without sounding alarmist
 - if there is an ask, make it explicit
@@ -135,7 +139,7 @@ Sources
 
 | Situation | Behavior |
 |---|---|
-| Only technical traces, no audience context | Render a concise update with explicit wording assumptions |
+| Only implementation traces, no audience context | Render a concise update with explicit wording assumptions |
 | No period given | Default to last 7 days |
 | No stakeholder-relevant progress | Offer a brief holding update instead of fabricating momentum |
 
@@ -156,6 +160,6 @@ Sources
 ## Validation checklist
 
 - Is the update understandable by someone outside day-to-day execution?
-- Does it translate technical work into stakeholder impact?
+- Does it translate implementation work into stakeholder impact?
 - Are risks and asks explicit without sounding alarmist?
 - Does the output match the client-update example shape and stay in one language?

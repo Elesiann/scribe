@@ -283,7 +283,7 @@ and concrete continuation steps from the work session.
 - Emit `next_action` only when the action is concrete (not "think about X")
 - For `loose-ends`, fail closed: if the item cannot answer "what is stuck / why is it suspect / what decision is needed now", do not emit it
 - For `loose-ends`, only emit `triage_status = parked` when an explicit parked signal exists in evidence; otherwise prefer `drifting`
-- For `loose-ends`, if the same work item appears across multiple work-tracking sources with conflicting explicit fields, do not flatten the conflict silently; record the mismatch, surface it in `why_flagged`, and lower `flag_confidence`
+- For `loose-ends`, if the same work item appears across multiple trackable sources with conflicting explicit fields, do not flatten the conflict silently; record the mismatch, surface it in `why_flagged`, and lower `flag_confidence`
 
 ## Renderer rules
 

@@ -18,7 +18,7 @@
 Ask only if not clear from the prompt:
 
 - **period** — time window
-  - Default: last 7 days (`git log --since "1 week ago"`)
+  - Default: last 7 days
   - Accepts: `"since monday"`, `"last 14 days"`, `"current sprint"`, `"2026-02-15..2026-02-20"`
 
 ## Optional inputs
@@ -26,22 +26,36 @@ Ask only if not clear from the prompt:
 - **destination** — `inline` (default) | `file` | `workspace-destination-suggestion`
 - **resource_scope** — override for the current code workspace or connected work context (useful in multi-workspace setups)
 
-## Sources (priority order)
+## Source selection
 
-| Source | Role | Required in mode |
-|---|---|---|
-| local code workspace | primary change evidence when available | rich, minimal |
-| work-tracking connector | organizational / task evidence | rich |
-| issue tracker connector | issue / planning evidence | rich |
-| code-hosting review signal | merge / review evidence | rich |
-| conversation | decisional signals from current session | always |
+Weekly is harness-agnostic. Source selection is driven by the user's scope and
+the available evidence, not by a fixed preference for code history.
+
+| Source family | Role |
+|---|---|
+| work-tracking / issue systems | planned, active, completed, blocked, or deferred work |
+| session traces / conversation | session-level decisions, attempts, corrections, blockers, and stated outcomes |
+| local code workspace | concrete implementation movement when code work is in scope |
+| code-hosting review signal | PR/review/merge state when review flow is the relevant work surface |
+| docs / filesystem / connected workspaces | specs, notes, artifacts, or other deliverables that explain what changed |
+
+Rules:
+
+- Use the sources that best prove what was done for the requested scope.
+- Do not treat git/GitHub as privileged unless the user asks for code-hosting
+  evidence or the work is primarily code delivery.
+- Do not treat conversation as delivery proof by itself unless the user provides
+  substantive notes or the work happened inside the active session.
+- If multiple sources describe the same work, merge them into one item and keep
+  the strongest evidence refs.
 
 ## Minimum viable signal
 
 For `weekly` to render quality, at least **one** of the following must hold:
-- `git_local` `used` + >= 3 meaningful changes in the period
-- a connected tracker/issue source `used` + >= 2 items in the period
-- `conversation` `used` + substantive context (pasted notes or decisional discussion)
+- a work-tracking / issue / code-hosting source shows completed or materially advanced work in the period
+- `git_local` shows meaningful implementation movement for a code-scoped weekly
+- `session_trace` or `conversation` contains substantive work-session evidence: outcomes, attempts, blockers, decisions, and current state
+- manual notes or docs describe concrete work done, not only intentions
 
 Below this, Scribe asks: "Not enough signal for a weekly. Paste extra notes or would you rather run `daily` with what we have?"
 
@@ -54,7 +68,13 @@ Secondary fields: `summary.themes`, `summary.where_we_stopped`.
 
 ## Gathering (capability-gated)
 
-### git (primary, if capability `git` is present)
+### session_trace (if available and relevant)
+
+Follow [../protocols/session-trace.md](../protocols/session-trace.md). Use it
+when the week's work happened inside agent sessions or when session state is the
+best evidence of outcomes, attempts, blockers, and where work stopped.
+
+### git (if available and relevant)
 
 **Authorship: assume multiple possible emails per user.** Using global `user.email` alone is fragile — a user may have different identities per workspace. Strategy:
 
@@ -92,7 +112,7 @@ git status --short
 
 ### Multi-workspace scan
 
-If the user asks for a cross-workspace recap ("all the codebases/workspaces I touched this week"), scanning requires discovery. Two strategies:
+If the user asks for a cross-workspace code recap ("all the codebases/workspaces I touched this week"), scanning requires discovery. Two strategies:
 
 **(Preferred) Pre-configured list:** skill maintains a local list of code workspaces (1 path per line). User fills it once; scan becomes fast and deterministic.
 
@@ -123,18 +143,30 @@ ORDER BY resolved DESC
 ```
 **Cap:** 20 items.
 
-### Code-hosting review signal (example: `gh` CLI)
+### Code-hosting contribution signal (example: `gh` CLI)
 
 ⚠ **Known bug:** `--json repository` **does not exist** on `gh pr list`. Valid fields include `number, title, mergedAt, url, author, headRepository, state`. To identify each review item's workspace, use `url` (parse the path) OR run `gh pr list` per local workspace (`cd <repo> && gh pr list`).
 
-**Option A — global search (parse workspace from URL):**
+Collect code-hosting evidence only when code review / PR flow is relevant to the
+requested weekly. Do not limit the signal to PRs authored by the current user:
+reviews, assigned PRs, commented PRs, and open PRs may be the more important
+work for the period.
+
+**Option A — authored/merged work (parse workspace from URL):**
 ```bash
 gh pr list --author @me --state merged \
   --search "merged:>=<period_start>" \
   --json number,title,mergedAt,url,headRepository --limit 20
 ```
 
-**Option B — per-workspace (more reliable in multi-workspace):**
+**Option B — involved/review work (per workspace, broader contribution signal):**
+```bash
+gh pr list --state all \
+  --search "involves:@me updated:>=<period_start>" \
+  --json number,title,state,mergedAt,updatedAt,url,author,reviewDecision --limit 20
+```
+
+**Option C — per-workspace authored work (more reliable in multi-workspace):**
 ```bash
 for repo in <repo_list>; do
   cd "$repo"
@@ -145,11 +177,14 @@ for repo in <repo_list>; do
 done
 ```
 
-**Cap:** 20 items total (not per repo).
+**Cap:** 20 items total per query family, then deduplicate by URL. Prefer the
+items that best explain work done in the period over raw volume.
 
 ### conversation (always)
 
 Filter the active conversation for:
+- Outcomes or completed work ("shipped X", "finished Y", "implemented Z")
+- Attempts that changed the work path ("tried X, failed because Y")
 - Decision mentions ("we chose X", "going with Y")
 - Blockers ("stuck on", "waiting on", "review not yet approved")
 - Intent markers ("next step", "tomorrow", "TODO")
@@ -251,9 +286,10 @@ Skeleton:
 
 | Situation | Behavior |
 |---|---|
-| current workspace has no local code history | Ask: "Point to another workspace or proceed with connected sources only?" |
-| Local code history OK, no connected trackers available | Proceeds in `minimal` mode, flagged in ledger |
-| No technical sources | `degraded` mode: ask "paste this week's notes"; emit ⚠ note |
+| requested source is unavailable | Ask before fallback, following explicit source requirement rules |
+| current workspace has no local code history, but connected/session/manual evidence is strong | Proceed from those sources; do not treat missing git as degraded by itself |
+| only weak intent-level conversation exists | Ask for notes or suggest `daily` if the scope is too thin |
+| no source contains evidence of work done | Do not generate a weekly; ask for a source or notes |
 
 ## Do / Don't
 

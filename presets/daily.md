@@ -39,18 +39,31 @@ Below this, Scribe asks: *"No substantive signals in this period. Paste today's 
 
 Secondary fields: `summary.headline`, `summary.where_we_stopped`.
 
-## Sources (priority)
+## Source selection
+
+Daily is harness-agnostic. Use the sources that best prove what changed or
+needs communication for the selected day.
 
 | Source | Role |
 |---|---|
-| `git_local` | primary local code/workspace evidence when available |
+| `session_trace` | progress, attempts, decisions, blockers, and current state from the active work session |
+| `git_local` | local implementation evidence when code work is in scope |
 | `conversation` | active session signals |
 | connected work tracker | tasks worked on today (optional enrichment) |
 | connected issue tracker | issues transitioned today (optional) |
 
+Do not require git for a daily unless the requested scope is code work. A daily
+can be valid from tracker updates, session traces, manual notes, docs, or
+conversation when they contain concrete work signals.
+
 ## Gathering (capability-gated)
 
-### git (if `used`)
+### session_trace (if available)
+
+Follow [../protocols/session-trace.md](../protocols/session-trace.md). Use it to
+capture session-level progress without replaying the full transcript.
+
+### git (if available and relevant)
 
 ```bash
 git log --since "1 day ago" --author="$(git config user.email)" \
@@ -78,7 +91,7 @@ assignee = currentUser() AND updated >= -1d ORDER BY updated DESC
 
 **Cap:** 10 items.
 
-### conversation (always)
+### conversation (if available and relevant)
 
 Filter active session for:
 - Progress markers ("did X", "finished Y", "deployed Z")
@@ -89,7 +102,7 @@ Filter active session for:
 
 Produce in `items[]` of ContextBundle:
 
-- `work_item`: each completed commit/task → 1 synthesized item (not 1 per commit — cluster related ones)
+- `work_item`: each completed or materially advanced work thread → 1 synthesized item (cluster related evidence; do not emit 1 item per commit/task)
 - `blocker`: stalled dependencies, active failures
 - `next_action`: concrete planned steps
 - `risk`: tight deadlines, fragile dependencies, possible regressions
@@ -136,8 +149,9 @@ Sources
 
 | Situation | Behavior |
 |---|---|
-| current workspace has no local code history | Degrade to conversation + connected sources; if both weak, ask for notes |
-| No git OR no substantive conversation | "Paste what you did today so I can build the daily" |
+| requested source is unavailable | Ask before fallback, following explicit source requirement rules |
+| current workspace has no local code history, but tracker/session/manual evidence is strong | Proceed from those sources; do not treat missing git as degraded by itself |
+| only weak intent-level conversation exists | Ask for notes |
 | No activity in period | Don't generate daily — report: "Nothing detected today. Skip?" |
 
 ## Do / Don't
@@ -151,7 +165,7 @@ Sources
 **Don't:**
 - Don't list raw commits
 - Don't mix with weekly (short scope, short output)
-- Don't inflate with "meetings", "emails" if not technical work
+- Don't inflate with low-signal meetings/emails; include them only when they changed work state, decisions, blockers, or next steps
 
 ## Validation checklist
 

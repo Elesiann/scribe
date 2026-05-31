@@ -10,21 +10,21 @@ Dense week closing the CSV import workstream and hardening the sync engine. Thre
 
 ## By theme
 
-### Import path (8 commits, 4 tasks, 2 PRs) — 45% of period
+### Import path closeout
 
 CSV importer landed end-to-end: parser, dry-run preview, mapping UI, and the import doc with a sample file. PR #312 (parser + dry-run) and PR #318 (duplicate-detection extraction) were sequenced because the helpers were duplicated across the manual-merge code path. Extracting them first would have inflated the parser PR; sequencing it after kept each PR reviewable.
 
 The XLSX importer remains explicitly out of scope for this cycle — backlog item to revisit after the streaming-writer ADR is implemented.
 
-### Sync engine hardening (5 commits, 1 PR) — 25%
+### Sync engine hardening
 
 The per-workspace outbound buffer used a fixed queue size; under fixture-heavy tests it overflowed silently and ate retries. Made it tunable per workspace, with a sane default; two flaky tests went green.
 
-### Membership lookup regression (4 commits, no task) — 18%
+### Membership lookup regression
 
 A load-test run surfaced an N+1 in the membership cache lookup; the cache wasn't keyed by `(workspace_id, member_id)`, so the hot path was re-fetching. Local fix shipped (commit `ccc3333`); follow-up: expose the cache TTL via config so it can be tuned per deployment.
 
-### Misc / housekeeping (2 commits) — 12%
+### Misc / housekeeping
 
 Bumped the toolchain pin, deleted a dead worker script, refreshed the contributor guide.
 
