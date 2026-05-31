@@ -15,6 +15,10 @@ evidence → semantic normalization → preset → artifact
 
 The input doesn't change. The preset does.
 
+For agentic work, the primary evidence may be a **session trace**: a compact
+record of what happened during a work session before it becomes a
+`ContextBundle`. See [protocols/session-trace.md](protocols/session-trace.md).
+
 ## Presets as lenses over the same operation
 
 | Preset | Question it answers | Lens |
@@ -70,6 +74,7 @@ Interface Adapters              Scribe Engine                 Runtime Plumbing
 - Skill Adapter (MVP)            - Preset Resolver             - Capability Probes
 - CLI Adapter (future)           - Evidence Gatherer           - Source Ledger
 - API Adapter (future)           - Evidence Normalizer         - Graceful Degradation
+                                 - Session Trace Adapter
                                  - Preset Renderer
 
 All adapters compile user input → PresetInvocation → engine
@@ -113,6 +118,7 @@ digraph scribe {
     "Detect capabilities (probes)" [shape=box];
     "Ask minimal required inputs" [shape=box];
     "Gather evidence (enabled sources)" [shape=box];
+    "Normalize session traces when present" [shape=box];
     "Assemble ContextBundle" [shape=box];
     "Apply preset lens → Markdown" [shape=box];
     "Append source ledger" [shape=box];
@@ -123,7 +129,8 @@ digraph scribe {
     "Resolve intent → PresetInvocation" -> "Detect capabilities (probes)";
     "Detect capabilities (probes)" -> "Ask minimal required inputs";
     "Ask minimal required inputs" -> "Gather evidence (enabled sources)";
-    "Gather evidence (enabled sources)" -> "Assemble ContextBundle";
+    "Gather evidence (enabled sources)" -> "Normalize session traces when present";
+    "Normalize session traces when present" -> "Assemble ContextBundle";
     "Assemble ContextBundle" -> "Apply preset lens → Markdown";
     "Apply preset lens → Markdown" -> "Append source ledger";
     "Append source ledger" -> "Preview + approved?";
@@ -258,6 +265,10 @@ Execute the preset's gathering instructions, respecting the capability manifest.
 ## Step 5 — Assemble ContextBundle
 
 Follow [protocols/context-bundle.md](protocols/context-bundle.md). Normalizes any combination of sources into a single shape (10 top-level fields). Separates `raw` evidence from `items` (normalized operational units).
+
+If evidence comes from an agent session, first normalize it through
+[protocols/session-trace.md](protocols/session-trace.md), then map the trace into
+`evidence[]`, `items[]`, `entities`, and `summary`.
 
 **Item types** (fixed 9): `work_item | decision | risk | blocker | next_action | artifact_ref | delivery | attempt | open_question`.
 

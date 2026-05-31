@@ -48,6 +48,7 @@ Each source appears in **exactly one bucket**. Never two.
 Use the IDs from `sources[].id` in the ContextBundle. Common examples:
 
 - `conversation` — active session context
+- `session_trace` — compact normalized record of an agent work session
 - `manual` — notes pasted by the user
 - `git_local` — local code workspace detected
 - `gh` — authenticated code-hosting CLI

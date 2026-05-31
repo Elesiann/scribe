@@ -5,6 +5,9 @@
 
 ContextBundle is the neutral contract between **evidence acquisition** and **preset rendering**. It normalizes any combination of sources into a single shape that all presets can consume.
 
+When the evidence is an agent work session, normalize it first as a
+[`SessionTrace`](session-trace.md), then map the trace into this bundle.
+
 ## Pipeline position
 
 ```
@@ -98,6 +101,7 @@ Runtime capabilities as boolean flags — independent of branding.
 ```json
 {
   "conversation": true,
+  "session_trace": true,
   "connectors": true,
   "mcp": true,
   "filesystem": true,
@@ -114,6 +118,7 @@ Candidate sources with their final status.
 ```json
 [
   { "id": "conversation", "kind": "conversation", "status": "used" },
+  { "id": "session_trace", "kind": "session_trace", "status": "used", "label": "Current agent session" },
   { "id": "git_local",    "kind": "git",          "status": "used", "label": "Local code workspace" },
   { "id": "work_tracker", "kind": "connector",    "status": "missing", "details": "Not exposed in this surface" }
 ]
@@ -124,7 +129,7 @@ Optional: `label`, `details`, `probe`, `error_code`.
 
 **Allowed `status`** (fixed 4): `used | missing | denied | error`.
 
-**Allowed `kind`:** `conversation | manual | connector | mcp | filesystem | git | gh`.
+**Allowed `kind`:** `conversation | session_trace | manual | connector | mcp | filesystem | git | gh`.
 
 ### `entities`
 
@@ -147,6 +152,10 @@ Source-specific evidence, minimally processed. Sparse by default.
 ```json
 {
   "manual_notes": ["Keep engine-first framing"],
+  "session_trace": {
+    "objective": "Add session-trace support",
+    "state": "Protocol added; docs still need wiring"
+  },
   "conversation": { "highlights": ["Surface-aware is plumbing"] },
   "git": {
     "repo_root": "/path/to/project-a",
@@ -218,6 +227,9 @@ Optional metadata frequently used by triage-oriented presets:
 
 **Provenance rule:** prefer `evidence_refs` for canonical provenance; `evidence` inline may serve as a human-readable shorthand.
 
+Session trace refs use the `session_trace:<trace-id>` form, for example
+`session_trace:event-002` or `session_trace:decision-001`.
+
 ### `summary`
 
 Preset-agnostic rollup that helps rendering.
@@ -254,11 +266,18 @@ Each preset consumes a specific subset of item types.
 | `retro` | `delivery`, `decision`, `risk`, `blocker`, `attempt`, `next_action` | `summary.themes`, `meta.notes` |
 | `loose-ends` | `work_item`, `blocker`, `risk`, `next_action`, `open_question` | per-item triage metadata (`triage_status`, `why_flagged`, `recommended_action`, `flag_confidence`, `last_activity_at`, `owner`, `system`) |
 
+Session traces are especially useful for `handoff`, `daily`, `adr`, and
+`retro`, because they preserve decisions, attempts, corrections, current state,
+and concrete continuation steps from the work session.
+
 ## Extraction rules
 
 - **Collectors emit evidence, not prose.** Rendering stays in the renderer.
 - Merge duplicate facts across sources into a single `item`
 - Preserve the strongest evidence source list in `evidence_refs`
+- Map `SessionTrace.decisions[]` to `decision`, `attempts[]` to `attempt`,
+  `artifacts[]` to `artifact_ref`, `open_threads[]` to `open_question` / `risk`
+  / `blocker`, and `next_actions[]` to `next_action`
 - Prefer `decision` over generic `work_item` when an architectural choice is clear
 - Prefer `blocker` over `risk` when the issue is actively halting progress
 - Emit `next_action` only when the action is concrete (not "think about X")

@@ -8,6 +8,10 @@ evidence → semantic normalization → preset → artifact
 
 The input doesn't change. The preset does.
 
+For agentic work, Scribe can treat a work session itself as evidence: a compact
+session trace becomes normalized evidence, then the selected preset renders the
+artifact.
+
 ## What this is
 
 Scribe is a **preset engine** that turns work evidence into operational artifacts. Each artifact a working person regularly needs — a daily recap, a weekly recap, an ADR, a session handoff, a client update, a retro, a loose-ends triage — is the same pipeline with a different lens.
@@ -102,6 +106,9 @@ Capability detection
 Evidence gathering (sources gated by capabilities)
               │
               ▼
+Session trace normalization (when evidence is an agent session)
+              │
+              ▼
 ContextBundle (neutral contract)
               │
               ▼
@@ -114,6 +121,7 @@ Source ledger (mandatory)
 The skill is one adapter. A CLI, a cron job, or an API would be other adapters over the same engine. Internal contracts:
 
 - [`protocols/capability-detection.md`](protocols/capability-detection.md) — how Scribe discovers which sources are available at runtime
+- [`protocols/session-trace.md`](protocols/session-trace.md) — how an agent work session becomes compact operational evidence
 - [`protocols/context-bundle.md`](protocols/context-bundle.md) — the neutral contract between evidence and rendering
 - [`protocols/source-ledger.md`](protocols/source-ledger.md) — the provenance block every artifact ends with
 
