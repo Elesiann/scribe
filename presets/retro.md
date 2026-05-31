@@ -105,6 +105,17 @@ Rules:
 - each "change next time" item should be actionable
 - keep the writing honest and compact
 
+### Section gates
+
+- `What went well` requires positive outcome or delivery evidence; otherwise omit.
+- `What was painful` requires blocker, risk, failed/partial attempt, or explicit friction evidence.
+- `What surprised us` requires a concrete unexpected outcome; otherwise omit.
+- `Decisions / lessons` requires evidence-backed decisions or lessons; otherwise omit.
+- `Keep doing` requires evidence that a behavior helped; otherwise omit.
+- `Change next time` requires actionable process/product changes; otherwise omit.
+- `Open questions` requires unresolved `open_question` items; otherwise omit.
+- If all contrast sections would be empty, ask for what worked / what hurt instead of rendering.
+
 ## Output template
 
 See [examples/retro.good.md](../examples/retro.good.md) for the canonical shape.

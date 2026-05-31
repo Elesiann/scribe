@@ -196,17 +196,21 @@ Emit a bullet list of relevant user statements. Skip trivia.
 Produce in `extracted` / `items[]` of the ContextBundle:
 
 ### themes
-Cluster changes + tasks + review items into 2–5 thematic groups. Labels come from titles, linked work, and visible intent.
+Cluster normalized work items into 2–5 thematic groups. Labels come from the
+work itself: tracker titles, shipped artifacts, session objectives, specs,
+reviews, commits, docs, and visible intent.
 
 Format:
 ```
-- Sync engine hardening (9 changes, 3 tasks, 1 review item) — 47% of period
-- Import path closeout (3 changes, 1 task) — 18%
-- Customer-specific integration work (4 changes) — 23%
-- Infra / misc (1 change, 1 task) — 12%
+- Sync engine hardening — 9 evidence refs across code, review, and tracker
+- Import path closeout — 3 delivered artifacts, 1 task, 1 session decision
+- Customer-specific integration work — 4 work items
+- Infra / misc — low-volume support work
 ```
 
-**Rule:** percentages should add up to roughly 100%; use item count as weight.
+**Rule:** do not force percentages. Use percentages only when the evidence has a
+reasonable denominator, such as explicit time allocation, item counts across a
+well-scoped tracker, or a clear code/workspace scan.
 
 ### decisions_mentioned
 Technical decisions made in the period. Extract from:
@@ -245,6 +249,15 @@ After the bundle + extracted are ready, synthesize following the output template
 - If unresolved WIP deserves investigation, mention it briefly and suggest `loose-ends`; do not triage item-by-item here
 - Tone: plain engineering English
 
+### Section gates
+
+- `Highlights` requires 2-5 outcomes, decisions, or material advances; omit low-signal activity.
+- Each `By theme` section requires at least one normalized item and at least one evidence ref.
+- `Decisions` requires `decision` items; otherwise omit.
+- `Blockers / risks` requires `blocker` or `risk` items; otherwise omit.
+- `Where we stopped` requires live state evidence from a source such as session trace, tracker, code workspace, PR/review state, or manual notes.
+- `Next steps` requires concrete `next_action` items or strongly implied continuation from current state.
+
 ## Output template
 
 See [examples/weekly.good.md](../examples/weekly.good.md) for the canonical shape.
@@ -260,10 +273,10 @@ Skeleton:
 
 ## By theme
 
-### <Theme 1> (<N items, X% of period>)
+### <Theme 1>
 <narrative synthesis; cite IDs/links inline>
 
-### <Theme 2> (...)
+### <Theme 2>
 ...
 
 ## Decisions

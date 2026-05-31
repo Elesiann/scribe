@@ -62,9 +62,12 @@ Apply these rules in every invocation:
 
 - **Progressive disclosure** — ask only the minimum clarifications needed to resolve preset, scope, language, or explicit source requirements
 - **Few-shot by example** — before rendering, load the matching `examples/<preset>.good.md` and mirror its section shape and level of specificity, not its domain nouns, product names, or stack assumptions
-- **Structure before prose** — first decide sections and item coverage from the bundle, then write the prose
+- **Structured intermediate first** — extract into `ContextBundle.items[]` before writing artifact prose; never render directly from raw evidence
+- **Structure before prose** — first decide sections, item coverage, and omissions from the bundle, then write the prose
+- **Evidence gates** — every rendered claim must trace to an `item` or evidence ref; if a section has no supporting item, omit it or ask for missing input
 - **Fail closed** — if the preset lacks minimum viable signal, ask or degrade explicitly; do not fabricate momentum, rationale, or decisions
-- **Validation before delivery** — run the preset's verification checklist before showing the artifact
+- **Internal reasoning, final artifact only** — use planning/checking internally, but do not output reasoning traces, extraction notes, or validation logs unless the user asks
+- **Validation before delivery** — run the preset's verification checklist before showing the artifact; revise before delivery if any check fails
 
 ## Scribe Engine + Interface Adapters
 
@@ -297,9 +300,10 @@ Invariant rules:
 Renderer workflow:
 
 1. Load the matching canonical example
-2. Build a section plan from the bundle
-3. Check that each planned section has enough evidence
+2. Build an internal section plan from the bundle: `section`, `include?`, `supporting_item_ids`, `omit_reason`
+3. Check that each planned section passes the preset's section gates
 4. Write the artifact following the preset's exact section order
+5. Remove empty sections, extraction notes, confidence scratchwork, and validation notes from the final artifact
 
 ## Step 6.5 — Validate before delivery
 

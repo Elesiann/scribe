@@ -186,6 +186,15 @@ Rules:
 - if one item clearly needs packaging for continuation, suggest `handoff`
 - when cross-source mismatch is the main signal, say so explicitly instead of pretending the item is cleanly classified
 
+### Section gates
+
+- `Stale` requires strong evidence of stopped work plus decision pressure now.
+- `Drifting` requires evidence of weak momentum, mismatch, or unresolved movement.
+- `Parked` requires explicit intentional pause evidence; otherwise omit the entire section.
+- Every surfaced item requires `why_flagged`, `recommended_action`, `confidence`, and `evidence_refs`.
+- `Recommended actions` requires at least one surfaced item; actions must correspond to item-level recommendations.
+- If fewer than one item passes these gates, ask for a clearer work surface instead of rendering a padded report.
+
 ## Output template
 
 See [examples/loose-ends.good.md](../examples/loose-ends.good.md) for the canonical shape.

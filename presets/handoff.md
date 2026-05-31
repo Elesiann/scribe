@@ -108,6 +108,16 @@ Tasks or docs linked to the current objective/resource (if the conversation ment
 
 Tone: action-oriented, pragmatic. Think of the next operator as a **capable stranger** — explain enough context for them to pick up work in 5 minutes.
 
+### Section gates
+
+- `Context` and `Objective` require a resolved objective; if missing, ask instead of rendering.
+- `Current state` requires at least one state signal: session state, resource status, modified artifact, tracker state, branch state, blocker, or recent decision.
+- `Decisions already made` requires `decision` items; otherwise omit.
+- `Attempts made` requires `attempt` items; otherwise omit.
+- `Current blockers`, `Open questions`, and `Risks` require matching items; otherwise omit.
+- `Next steps` requires at least one concrete `next_action`; if missing, ask what should happen next.
+- `Suggested resumption prompt` is mandatory and must only include details already present in the handoff.
+
 ## Output template
 
 See [examples/handoff.good.md](../examples/handoff.good.md) for the canonical shape.

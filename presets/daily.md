@@ -116,6 +116,14 @@ Produce in `items[]` of ContextBundle:
 - Risks only if something non-trivial
 - Tone: plain engineering English, short, standup-friendly
 
+### Section gates
+
+- `Progress` requires at least one `work_item` or concrete session outcome.
+- `Blockers` requires at least one `blocker`; otherwise omit.
+- `Next steps` requires at least one concrete `next_action`; otherwise omit.
+- `Risks` requires at least one non-trivial `risk`; otherwise omit.
+- If only intent markers exist and no work state changed, ask for notes instead of rendering.
+
 ## Output template
 
 See [examples/daily.good.md](../examples/daily.good.md) for the canonical shape.

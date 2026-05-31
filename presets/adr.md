@@ -116,6 +116,15 @@ MADR-style. Tone rules:
 - **Honest** alternatives — only those that were really considered; "none" is valid if there weren't any
 - Consequences: explicit positive + negative
 
+### Section gates
+
+- `Context` requires evidence of the problem, constraint, or tradeoff that made the decision necessary.
+- `Decision` requires exactly one accepted/proposed decision item.
+- `Alternatives considered` must use real alternatives from evidence; if none exist, say so directly.
+- `Consequences` requires at least one grounded implication; include negative/open cost when present.
+- `Next steps` requires concrete follow-up actions; otherwise omit.
+- `Links` requires actual referenced artifacts; otherwise omit.
+
 ## Output template
 
 See [examples/adr.good.md](../examples/adr.good.md) for the canonical shape.

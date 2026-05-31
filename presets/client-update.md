@@ -101,6 +101,15 @@ Rules:
 - if there is an ask, make it explicit
 - assume the reader does not live in the codebase or in the implementation details
 
+### Section gates
+
+- `Snapshot` requires externally meaningful state: progress, risk, ask, or current milestone state.
+- `Progress since last update` requires `delivery` or audience-relevant `work_item` evidence.
+- `What this changes for you` requires a defensible stakeholder impact; otherwise omit.
+- `Risks / asks` requires a `risk`, `blocker`, or explicit dependency; otherwise omit.
+- `Next steps` requires concrete `next_action` items or committed continuation.
+- `Links` requires audience-safe docs, milestones, issues, or artifacts; otherwise omit.
+
 ## Output template
 
 See [examples/client-update.good.md](../examples/client-update.good.md) for the canonical shape.
